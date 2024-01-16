@@ -134,7 +134,7 @@ export const getFormattedSchedulesByFacultyId = async (faculty_id: number) => {
       formattedData[i].schedules.push({
         day: undefinedDays[j],
         course: '',
-        initials: '',
+        initials: userdata.initials,
         room: '',
         section: ''
       });
