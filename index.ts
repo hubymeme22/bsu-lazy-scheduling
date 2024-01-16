@@ -8,7 +8,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app: Express = express();
-const port = process.env.PORT || 8000;
+const port = parseInt(process.env.PORT as string) || 8000;
+const host = process.env.IP || 'localhost';
 
 app.use(express.json());
 app.use(cookieParser());
@@ -22,6 +23,6 @@ app.get('/', (req: Request, res: Response) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`[+] Server started at: http://localhost:${port}/`);
+app.listen(port, host, () => {
+  console.log(`[+] Server started at: http://${host}:${port}/`);
 });
