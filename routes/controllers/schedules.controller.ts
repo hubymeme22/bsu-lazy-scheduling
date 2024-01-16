@@ -10,6 +10,13 @@ export const getSchedulesByFacultyId = (req: Request, res: Response) => {
   });
 };
 
+export const getSchedulesBySection = (req: Request, res: Response) => {
+  requestHandler(res, async () => {
+    const { room_code } = req.params;
+    res.json(await service.getSchedulesBySection(room_code));
+  });
+};
+
 export const bulkScheduleCreate = (req: Request, res: Response) => {
   requestHandler(res, async () => {
     const { rows } = req.body;

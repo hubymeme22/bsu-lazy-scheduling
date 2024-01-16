@@ -1,5 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import cookieParser from "cookie-parser";
+import cors from "cors";
+
 import authChecker from './middlewares/auth-check';
 import apiRoute from './routes/api';
 import authRoute from './routes/auth';
@@ -11,6 +13,7 @@ const app: Express = express();
 const port = parseInt(process.env.PORT as string) || 8000;
 const host = process.env.IP || 'localhost';
 
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use(authRoute);

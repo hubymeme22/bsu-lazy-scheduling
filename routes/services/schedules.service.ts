@@ -2,11 +2,6 @@ import Schedules from "../../db/models/Scheduling";
 import { ScheduleInterface } from "../../db/models/Scheduling";
 import Faculties from "../../db/models/Faculties";
 
-interface conflict {
-  conflicted: boolean;
-  schedule: ScheduleInterface;
-}
-
 export const conflictCheck = async (schedule: ScheduleInterface) => {
   const { time, day, room } = schedule;
   const scheduleMatch = await Schedules.findAndCountAll({
@@ -45,6 +40,18 @@ export const getSchedulesByFacultyId = async (faculty_id: number) => {
 
   return await Schedules.findAndCountAll({
     where: { initials: userdata.initials }
+  });
+};
+
+export const getSchedulesBySubject = async (subjectCode: string) => {
+  return await Schedules.findAndCountAll({
+    where: { subject: subjectCode }
+  });
+};
+
+export const getSchedulesBySection = async (section: string) => {
+  return await Schedules.findAndCountAll({
+    where: { section }
   });
 };
 
