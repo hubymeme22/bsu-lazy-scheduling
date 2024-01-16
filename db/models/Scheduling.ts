@@ -14,13 +14,13 @@ export interface ScheduleInterface {
 
 export interface FormattedSched {
   time: string;
-  schedules: {
+  schedules: [{
     day: string,
     course: string,
     room: string,
     section: string,
     initials: string;
-  }
+  }]
 }
 
 class Schedules extends Model<ScheduleInterface> {

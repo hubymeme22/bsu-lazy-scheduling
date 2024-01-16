@@ -50,19 +50,27 @@ export const bulkScheduleCreate = async (schedule: ScheduleInterface[]) => {
 };
 
 export const bulkFormattedScheduleCreate = async (schedule: FormattedSched[]) => {
+  schedule = schedule.filter(sched => sched.schedules.length > 0);
   const formatSchedule = schedule.map(sched => {
-    return {
-      day: sched.schedules.day,
-      time: sched.time,
-      section: sched.schedules.section,
-      room: sched.schedules.room,
-      subject: sched.schedules.course,
-      initials: sched.schedules.initials,
-      time_type: 'am'
-    };
+    return sched.schedules.map(isched => {
+      return {
+        day: isched.day,
+        time: sched.time,
+        section: isched.section,
+        room: isched.room,
+        subject: isched.course,
+        initials: isched.initials,
+        time_type: 'am'
+      };
+    });
   });
 
-  return await bulkScheduleCreate(formatSchedule);
+  const oneDimensionSched = [];
+  for (let i = 0; i < formatSchedule.length; i++)
+    for (let j = 0; j < formatSchedule[0].length; j++)
+      oneDimensionSched.push(formatSchedule[i][j]);
+
+  return await bulkScheduleCreate(oneDimensionSched);
 };
 
 export const getSchedulesByFacultyId = async (faculty_id: number) => {
