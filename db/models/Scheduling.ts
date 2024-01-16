@@ -12,10 +12,22 @@ export interface ScheduleInterface {
   initials: string;
 }
 
+export interface FormattedSched {
+  time: string;
+  schedules: {
+    day: string,
+    course: string,
+    room: string,
+    section: string,
+    initials: string;
+  }
+}
+
 class Schedules extends Model<ScheduleInterface> {
   public id!: number;
   public day!: string;
-  public time!: 'am' | 'pm';
+  public time!: string;
+  public time_type!: 'am' | 'pm';
   public room!: string;
   public section!: string;
   public subject!: string;

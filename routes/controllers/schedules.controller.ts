@@ -1,12 +1,19 @@
 import { Request, Response } from "express";
 import { requestHandler } from "../utils";
-import { ScheduleInterface } from "../../db/models/Scheduling";
+import { FormattedSched, ScheduleInterface } from "../../db/models/Scheduling";
 import * as service from "../services/schedules.service";
 
 export const getSchedulesByFacultyId = (req: Request, res: Response) => {
   requestHandler(res, async () => {
     const { user_id } = req.params;
     res.json(await service.getSchedulesByFacultyId(parseInt(user_id)));
+  });
+};
+
+export const getFormattedSchedulesByFacultyId = (req: Request, res: Response) => {
+  requestHandler(res, async () => {
+    const { user_id } = req.params;
+    res.json(await service.getFormattedSchedulesByFacultyId(parseInt(user_id)));
   });
 };
 
@@ -21,6 +28,13 @@ export const bulkScheduleCreate = (req: Request, res: Response) => {
   requestHandler(res, async () => {
     const { rows } = req.body;
     res.json(await service.bulkScheduleCreate(rows as ScheduleInterface[]));
+  });
+};
+
+export const bulkFormattedScheduleCreate = (req: Request, res: Response) => {
+  requestHandler(res, async () => {
+    const { rows } = req.body;
+    res.json(await service.bulkFormattedScheduleCreate(rows as FormattedSched[]));
   });
 };
 
