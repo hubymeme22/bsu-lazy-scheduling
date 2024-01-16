@@ -51,14 +51,15 @@ export const bulkScheduleCreate = async (schedule: ScheduleInterface[]) => {
   if (schedule.length === 0)
     return await Schedules.findAndCountAll();
 
-  const conflicts = [];
-  for (let i = 0; i < schedule.length; i++)
-    conflicts.push(await conflictCheck(schedule[i]));
-
-  const allConflicts = conflicts.filter(conflict => conflict.conflicted);
-  if (allConflicts.length > 0)
-    throw [{ conflicts: allConflicts }, 400];
-
+  // const conflicts = [];
+  // for (let i = 0; i < schedule.length; i++) {
+    //   conflicts.push(await conflictCheck(schedule[i]));
+    // }
+    // const allConflicts = conflicts.filter(conflict => conflict.conflicted);
+    // if (allConflicts.length > 0)
+    //   throw [{ conflicts: allConflicts }, 400];
+    
+  await Schedules.destroy({ where: {} });
   await Schedules.bulkCreate(schedule);
   return await Schedules.findAndCountAll();
 };
