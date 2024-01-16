@@ -52,11 +52,12 @@ export const bulkScheduleCreate = async (schedule: ScheduleInterface[]) => {
 
   // const conflicts = [];
   // for (let i = 0; i < schedule.length; i++) {
-    //   conflicts.push(await conflictCheck(schedule[i]));
-    // }
-    // const allConflicts = conflicts.filter(conflict => conflict.conflicted);
-    // if (allConflicts.length > 0)
-    //   throw [{ conflicts: allConflicts }, 400];
+  //     conflicts.push(await conflictCheck(schedule[i]));
+  // }
+
+  // const allConflicts = conflicts.filter(conflict => conflict.conflicted);
+  // if (allConflicts.length > 0)
+  //   throw [{ conflicts: allConflicts }, 400];
     
   await Schedules.destroy({ where: {} });
   await Schedules.bulkCreate(schedule);
@@ -115,7 +116,7 @@ export const getFormattedSchedulesByFacultyId = async (faculty_id: number) => {
         course: sched.subject,
         room: sched.room,
         section: sched.section,
-        initials: sched.initials
+        initials: userdata.initials
       };
     });
 
