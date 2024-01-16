@@ -60,7 +60,7 @@ export const bulkScheduleCreate = async (schedule: ScheduleInterface[]) => {
   // if (allConflicts.length > 0)
   //   throw [{ conflicts: allConflicts }, 400];
     
-  await Schedules.destroy({ where: {} });
+  await Schedules.destroy({ where: { initials: schedule[0].initials } });
   await Schedules.bulkCreate(schedule);
   return await Schedules.findAndCountAll();
 };
