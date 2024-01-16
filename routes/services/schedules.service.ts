@@ -27,6 +27,13 @@ const DAY_TYPE = [
   'sunday'
 ];
 
+interface Sched {
+  day: string;
+  course: string;
+  room: string;
+  section: string;
+  initials: string;
+}
 
 export const conflictCheck = async (schedule: ScheduleInterface) => {
   const { time, day, room } = schedule;
@@ -139,6 +146,10 @@ export const getFormattedSchedulesByFacultyId = async (faculty_id: number) => {
         room: '',
         section: ''
       });
+
+    formattedData[i].schedules.sort((a: Sched, b: Sched) => {
+      return DAY_TYPE.indexOf(a.day) - DAY_TYPE.indexOf(b.day);
+    });
   }
 
   return formattedData;
