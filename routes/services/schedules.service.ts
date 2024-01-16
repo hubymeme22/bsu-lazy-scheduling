@@ -17,6 +17,16 @@ const TIME_TYPE = [
   "18:00 - 19:00",
 ];
 
+const DAY_TYPE = [
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday'
+];
+
 
 export const conflictCheck = async (schedule: ScheduleInterface) => {
   const { time, day, room } = schedule;
@@ -93,7 +103,7 @@ export const getFormattedSchedulesByFacultyId = async (faculty_id: number) => {
     raw: true
   });
 
-  return TIME_TYPE.map((time, index) => {
+  const formattedData = TIME_TYPE.map((time, index) => {
     const filteredSchedules: Schedules[] = schedules.rows.filter(sched => sched.time === time);
     const formattedSchedules = filteredSchedules.map(sched => {
       return {
@@ -107,6 +117,25 @@ export const getFormattedSchedulesByFacultyId = async (faculty_id: number) => {
 
     return { time, schedules: formattedSchedules };
   });
+
+  // prototype solution
+  for (let i = 0; i < formattedData.length; i++) {
+    const includedDays: string[] = [];
+    for (let j = 0; j < formattedData[i].schedules.length; j++)
+      includedDays.push(formattedData[i].schedules[j].day);
+
+    const undefinedDays = DAY_TYPE.filter(day => !includedDays.includes(day));
+    for (let j = 0; j < undefinedDays.length; j++)
+      formattedData[i].schedules.push({
+        day: undefinedDays[j],
+        course: '',
+        initials: '',
+        room: '',
+        section: ''
+      });
+  }
+
+  return formattedData;
 };
 
 export const getSchedulesBySubject = async (subjectCode: string) => {
