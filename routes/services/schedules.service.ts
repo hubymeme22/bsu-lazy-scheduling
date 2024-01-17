@@ -1,6 +1,7 @@
 import Schedules from "../../db/models/Scheduling";
 import Faculties from "../../db/models/Faculties";
 import { FormattedSched, ScheduleInterface } from "../../db/models/Scheduling";
+import { Op } from "sequelize";
 
 const TIME_TYPE = [
   "06:00 - 07:00",
@@ -38,7 +39,12 @@ interface Sched {
 export const conflictCheck = async (schedule: ScheduleInterface) => {
   const { time, day, room } = schedule;
   const scheduleMatch = await Schedules.findAndCountAll({
-    where: { time, day, room }
+    where: {
+      time, day, room,
+      initials: {
+        [Op.not]: schedule.initials
+      }
+    }
   });
 
   if (scheduleMatch.count > 0)
@@ -58,15 +64,15 @@ export const bulkScheduleCreate = async (schedule: ScheduleInterface[]) => {
   if (schedule.length === 0)
     return await Schedules.findAndCountAll();
 
-  // const conflicts = [];
-  // for (let i = 0; i < schedule.length; i++) {
-  //     conflicts.push(await conflictCheck(schedule[i]));
-  // }
+  const conflicts = [];
+  for (let i = 0; i < schedule.length; i++) {
+      conflicts.push(await conflictCheck(schedule[i]));
+  }
 
-  // const allConflicts = conflicts.filter(conflict => conflict.conflicted);
-  // if (allConflicts.length > 0)
-  //   throw [{ conflicts: allConflicts }, 400];
-    
+  const allConflicts = conflicts.filter(conflict => conflict.conflicted);
+  if (allConflicts.length > 0)
+    throw [{ conflicts: allConflicts }, 400];
+
   await Schedules.destroy({ where: { initials: schedule[0].initials } });
   await Schedules.bulkCreate(schedule);
   return await Schedules.findAndCountAll();
