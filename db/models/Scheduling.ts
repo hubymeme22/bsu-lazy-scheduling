@@ -3,6 +3,7 @@ import sequelizeConnection from "../connection";
 
 export interface ScheduleInterface {
   id?: number;
+  conflicted?: boolean;
   day: string;
   section: string;
   room: string;
