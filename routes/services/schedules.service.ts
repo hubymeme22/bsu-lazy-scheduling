@@ -1,6 +1,7 @@
 import Schedules from "../../db/models/Scheduling";
 import Faculties from "../../db/models/Faculties";
 import { FormattedSched, ScheduleInterface } from "../../db/models/Scheduling";
+import { FacultiesInterface } from "../../db/models/Faculties";
 import { Op } from "sequelize";
 
 const TIME_TYPE = [
@@ -37,6 +38,54 @@ interface Sched {
   initials: string;
 }
 
+interface FormattedData {
+  time: string;
+  schedules: Sched[];
+}
+
+const formatData = (schedules: ScheduleInterface[]) => {
+  const formattedData: FormattedData[] = TIME_TYPE.map(time => {
+    const filteredSchedules: ScheduleInterface[] = schedules.filter(sched => sched.time === time);
+    const formattedSchedules = filteredSchedules.map(sched => {
+      return {
+        day: sched.day,
+        course: sched.subject,
+        room: sched.room,
+        section: sched.section,
+        initials: sched.initials
+      };
+    });
+    
+    return { time, schedules: formattedSchedules };
+  });
+  
+  // first user
+  const firstinitial = schedules[0].initials;
+
+  // prototype solution
+  for (let i = 0; i < formattedData.length; i++) {
+    const includedDays: string[] = [];
+    for (let j = 0; j < formattedData[i].schedules.length; j++)
+      includedDays.push(formattedData[i].schedules[j].day);
+
+    const undefinedDays = DAY_TYPE.filter(day => !includedDays.includes(day));
+    for (let j = 0; j < undefinedDays.length; j++)
+      formattedData[i].schedules.push({
+        day: undefinedDays[j],
+        course: '',
+        initials: firstinitial,
+        room: '',
+        section: ''
+      });
+
+    formattedData[i].schedules.sort((a: Sched, b: Sched) => {
+      return DAY_TYPE.indexOf(a.day) - DAY_TYPE.indexOf(b.day);
+    });
+  }
+
+  return formattedData;
+};
+
 export const conflictCheck = async (schedule: ScheduleInterface) => {
   const { time, day, room } = schedule;
   const scheduleMatch = await Schedules.findAndCountAll({
@@ -71,8 +120,10 @@ export const bulkScheduleCreate = async (schedule: ScheduleInterface[]) => {
   }
 
   const allConflicts = conflicts.filter(conflict => conflict.conflicted);
-  if (allConflicts.length > 0)
-    throw [{ conflicts: allConflicts }, 400];
+  if (allConflicts.length > 0) {
+    const formattedConflict: ScheduleInterface[] = allConflicts.map(conflictedSchedule => conflictedSchedule.schedule);
+    throw [{ conflicts: allConflicts, formattedConflict: formatData(formattedConflict) }, 400];
+  }
 
   await Schedules.destroy({ where: { initials: schedule[0].initials } });
   await Schedules.bulkCreate(schedule);
@@ -123,43 +174,7 @@ export const getFormattedSchedulesByFacultyId = async (faculty_id: number) => {
     raw: true
   });
 
-  const formattedData = TIME_TYPE.map((time, index) => {
-    const filteredSchedules: Schedules[] = schedules.rows.filter(sched => sched.time === time);
-    const formattedSchedules = filteredSchedules.map(sched => {
-      return {
-        day: sched.day,
-        course: sched.subject,
-        room: sched.room,
-        section: sched.section,
-        initials: userdata.initials
-      };
-    });
-
-    return { time, schedules: formattedSchedules };
-  });
-
-  // prototype solution
-  for (let i = 0; i < formattedData.length; i++) {
-    const includedDays: string[] = [];
-    for (let j = 0; j < formattedData[i].schedules.length; j++)
-      includedDays.push(formattedData[i].schedules[j].day);
-
-    const undefinedDays = DAY_TYPE.filter(day => !includedDays.includes(day));
-    for (let j = 0; j < undefinedDays.length; j++)
-      formattedData[i].schedules.push({
-        day: undefinedDays[j],
-        course: '',
-        initials: userdata.initials,
-        room: '',
-        section: ''
-      });
-
-    formattedData[i].schedules.sort((a: Sched, b: Sched) => {
-      return DAY_TYPE.indexOf(a.day) - DAY_TYPE.indexOf(b.day);
-    });
-  }
-
-  return formattedData;
+  return formatData(schedules.rows);
 };
 
 export const getSchedulesBySubject = async (subjectCode: string) => {
