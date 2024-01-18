@@ -61,7 +61,7 @@ const formatData = (schedules: ScheduleInterface[], isRandomUser?: boolean, conf
   });
   
   // first user
-  const firstinitial = schedules[0].initials;
+  const firstinitial = schedules.length > 0 ? schedules[0].initials : '';
 
   // prototype solution
   for (let i = 0; i < formattedData.length; i++) {
