@@ -3,17 +3,22 @@ import {
   bulkFormattedScheduleCreate,
   bulkScheduleCreate,
   getFormattedSchedulesByFacultyId,
-  getSchedulesByFacultyId,
+  getFormattedSchedulesBySection,
+  getFormattedSchedulesByRoom,
   updateSingleSchedule
 } from "./controllers/schedules.controller";
 
 const router = Router();
-router.get('/user/:user_id', (req: Request, res: Response) => {
-  getSchedulesByFacultyId(req, res);
-});
-
 router.get('/user/formatted/:user_id', (req: Request, res: Response) => {
   getFormattedSchedulesByFacultyId(req, res);
+});
+
+router.get('/section/formatted/:section_code', (req: Request, res: Response) => {
+  getFormattedSchedulesBySection(req, res);
+});
+
+router.get('/room/formatted/:room_code', (req: Request, res: Response) => {
+  getFormattedSchedulesByRoom(req, res);
 });
 
 router.post('/bulk', (req: Request, res: Response) => {

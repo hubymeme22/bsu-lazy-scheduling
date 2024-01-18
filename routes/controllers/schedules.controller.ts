@@ -17,10 +17,17 @@ export const getFormattedSchedulesByFacultyId = (req: Request, res: Response) =>
   });
 };
 
-export const getSchedulesBySection = (req: Request, res: Response) => {
+export const getFormattedSchedulesBySection = (req: Request, res: Response) => {
+  requestHandler(res, async () => {
+    const { section_code } = req.params;
+    res.json(await service.getFormattedSchedulesBySection(section_code));
+  });
+};
+
+export const getFormattedSchedulesByRoom = (req: Request, res: Response) => {
   requestHandler(res, async () => {
     const { room_code } = req.params;
-    res.json(await service.getSchedulesBySection(room_code));
+    res.json(await service.getFormattedSchedulesByRoom(room_code));
   });
 };
 

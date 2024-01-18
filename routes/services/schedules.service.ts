@@ -43,7 +43,7 @@ interface FormattedData {
   schedules: Sched[];
 }
 
-const formatData = (schedules: ScheduleInterface[]) => {
+const formatData = (schedules: ScheduleInterface[], isRandomUser?: boolean) => {
   const formattedData: FormattedData[] = TIME_TYPE.map(time => {
     const filteredSchedules: ScheduleInterface[] = schedules.filter(sched => sched.time === time);
     const formattedSchedules = filteredSchedules.map(sched => {
@@ -73,7 +73,7 @@ const formatData = (schedules: ScheduleInterface[]) => {
       formattedData[i].schedules.push({
         day: undefinedDays[j],
         course: '',
-        initials: firstinitial,
+        initials: isRandomUser ? '' : firstinitial,
         room: '',
         section: ''
       });
@@ -164,29 +164,35 @@ export const getSchedulesByFacultyId = async (faculty_id: number) => {
   });
 };
 
+export const getSchedulesBySection = async (section: string) => {
+  return await Schedules.findAndCountAll({
+    where: { section }
+  });
+};
+
+export const getScedulesByRoom = async (room: string) => {
+  return await Schedules.findAndCountAll({
+    where: { room }
+  });
+};
+
 export const getFormattedSchedulesByFacultyId = async (faculty_id: number) => {
   const userdata = await Faculties.findByPk(faculty_id);
   if (!userdata)
     throw ['User has been deleted', 400];
 
-  const schedules = await Schedules.findAndCountAll({
-    where: { initials: userdata.initials },
-    raw: true
-  });
-
+  const schedules = await getSchedulesByFacultyId(faculty_id);
   return formatData(schedules.rows);
 };
 
-export const getSchedulesBySubject = async (subjectCode: string) => {
-  return await Schedules.findAndCountAll({
-    where: { subject: subjectCode }
-  });
+export const getFormattedSchedulesByRoom = async (room: string) => {
+  const schedules = await getScedulesByRoom(room);
+  return formatData(schedules.rows, true);
 };
 
-export const getSchedulesBySection = async (section: string) => {
-  return await Schedules.findAndCountAll({
-    where: { section }
-  });
+export const getFormattedSchedulesBySection = async (section: string) => {
+  const schedules = await getSchedulesBySection(section);
+  return formatData(schedules.rows, true);
 };
 
 export const updateSchedule = async (day: string, time: string, update: ScheduleInterface) => {
