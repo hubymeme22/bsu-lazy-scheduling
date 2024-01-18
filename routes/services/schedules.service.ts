@@ -43,7 +43,7 @@ interface FormattedData {
   schedules: Sched[];
 }
 
-const formatData = (schedules: ScheduleInterface[], isRandomUser?: boolean) => {
+const formatData = (schedules: ScheduleInterface[], isRandomUser?: boolean, conflicted?: boolean) => {
   const formattedData: FormattedData[] = TIME_TYPE.map(time => {
     const filteredSchedules: ScheduleInterface[] = schedules.filter(sched => sched.time === time);
     const formattedSchedules = filteredSchedules.map(sched => {
@@ -52,7 +52,8 @@ const formatData = (schedules: ScheduleInterface[], isRandomUser?: boolean) => {
         course: sched.subject,
         room: sched.room,
         section: sched.section,
-        initials: sched.initials
+        initials: sched.initials,
+        conflicted: conflicted ? sched.conflicted : undefined
       };
     });
     
@@ -124,7 +125,7 @@ export const bulkScheduleCreate = async (schedule: ScheduleInterface[]) => {
   const allConflicts = conflicts.filter(conflict => conflict.conflicted);
   if (allConflicts.length > 0) {
     const formattedConflict: ScheduleInterface[] = allConflicts.map(conflictedSchedule => conflictedSchedule.schedule);
-    throw [{ conflicts: allConflicts, formattedConflict: formatData(formattedConflict) }, 400];
+    throw [{ conflicts: allConflicts, formattedConflict: formatData(formattedConflict, false, true) }, 400];
   }
 
   await Schedules.destroy({ where: { initials: schedule[0].initials } });

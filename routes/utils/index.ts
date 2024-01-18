@@ -3,7 +3,6 @@ import { Response } from "express";
 export const requestHandler = async (res: Response, callback: () => void) => {
   try { await callback(); }
   catch(err) {
-    console.log(err);
     if (!Array.isArray(err))
       return res.json({ message: err });
 
