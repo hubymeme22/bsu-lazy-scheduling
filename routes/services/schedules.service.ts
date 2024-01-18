@@ -97,11 +97,13 @@ export const conflictCheck = async (schedule: ScheduleInterface) => {
     }
   });
 
-  if (scheduleMatch.count > 0)
+  if (scheduleMatch.count > 0) {
+    schedule.conflicted = true;
     return {
       conflicted: true,
       schedule
     };
+  }
 
   return {
     conflicted: false,
