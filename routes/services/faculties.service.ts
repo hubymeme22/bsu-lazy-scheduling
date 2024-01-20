@@ -3,8 +3,10 @@ import Schedules from "../../db/models/Scheduling";
 import { FacultiesInterface } from "../../db/models/Faculties";
 import { DAY_TYPE, TIME_TYPE } from "../utils";
 
-export const getFacultyById = async (id: number) => {
-  return await Faculties.findByPk(id);
+export const getFacultyByInitials = async (initials: string) => {
+  return await Faculties.findOne({
+    where: { initials }
+  });
 };
 
 export const getAllFaculties = async () => {
@@ -14,7 +16,7 @@ export const getAllFaculties = async () => {
 export const createFaculty = async (name: string, initials: string) => {
   const faculty = await Faculties.create({ name, initials });
   await initializeFacultySchedule(faculty.initials);
-  return getFacultyById(faculty.id);
+  return getFacultyByInitials(faculty.initials);
 };
 
 export const initializeFacultySchedule = async (initials: string) => {
@@ -32,18 +34,18 @@ export const initializeFacultySchedule = async (initials: string) => {
   }]);
 };
 
-export const deleteFaculty = async (id: number) => {
-  const faculty = await getFacultyById(id);
+export const deleteFaculty = async (initials: string) => {
+  const faculty = await getFacultyByInitials(initials);
   if (faculty) {
-    await Faculties.destroy({ where: { id } });
+    await Faculties.destroy({ where: { initials } });
     return faculty;
   }
 
   throw ['ID Provided does not exist', 404];
 };
 
-export const updateFaculty = async (id: number, update: FacultiesInterface) => {
-  const faculty = await Faculties.update(update, { where: { id } });
-  if (faculty) return getFacultyById(id);
+export const updateFaculty = async (initials: string, update: FacultiesInterface) => {
+  const faculty = await Faculties.update(update, { where: { initials } });
+  if (faculty) return getFacultyByInitials(initials);
   throw ['ID Provided does not exist', 404];
 };

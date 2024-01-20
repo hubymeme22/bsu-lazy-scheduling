@@ -14,7 +14,7 @@ router.put('/update', (req: Request, res: Response) => {
   editFaculty(req, res);
 });
 
-router.delete('/remove/:id', (req: Request, res: Response) => {
+router.delete('/remove/:initials', (req: Request, res: Response) => {
   removeFaculty(req, res);
 });
 

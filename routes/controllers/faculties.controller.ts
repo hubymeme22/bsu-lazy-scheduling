@@ -18,14 +18,14 @@ export const getAllFaculties = (res: Response) => {
 
 export const editFaculty = (req: Request, res: Response) => {
   requestHandler(res, async () => {
-    const {id, name, initials} = req.body;
-    const dbResponse = await service.updateFaculty(id, {name, initials});
+    const {name, initials} = req.body;
+    const dbResponse = await service.updateFaculty(initials, {name, initials});
     res.json(dbResponse);
   });
 };
 
 export const removeFaculty = (req: Request, res: Response) => {
   requestHandler(res, async () => {
-    res.json(await service.deleteFaculty(parseInt(req.params.id)));
+    res.json(await service.deleteFaculty(req.params.initials));
   });
 };
