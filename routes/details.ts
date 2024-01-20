@@ -14,7 +14,7 @@ router.get('/sections', (req: Request, res: Response) => {
   getAllSections(res);
 });
 
-router.get('/schedules/:initials', (req: Request, res: Response) => {
+router.get('/schedules/:id', (req: Request, res: Response) => {
   getScheduleDetails(req, res);
 });
 

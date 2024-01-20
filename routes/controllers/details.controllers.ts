@@ -24,6 +24,6 @@ export const getAllSections = (res: Response) => {
 
 export const getScheduleDetails = (req: Request, res: Response) => {
   requestHandler(res, async () => {
-    res.json(await schedDetailService.getFormattedUserScheduleDetail(req.params.initials));
+    res.json(await schedDetailService.getFormattedUserScheduleDetail(parseInt(req.params.id)));
   });
 }

@@ -1,6 +1,7 @@
 import { SchedDetailsInterface } from "../../db/models/SchedDetails";
 import { TIME_TYPE } from "../utils";
 import SchedDetails from "../../db/models/SchedDetails";
+import Faculties from "../../db/models/Faculties";
 
 // separates the even and odd schedules
 const formatSchedDetail = (initials: string, schedDetails: SchedDetailsInterface[]) => {
@@ -65,7 +66,12 @@ export const getUserScheduleDetail = async (initials: string) => {
   });
 };
 
-export const getFormattedUserScheduleDetail = async (initials: string) => {
-  const userschedDetails = await getUserScheduleDetail(initials);
-  return formatSchedDetail(initials, userschedDetails);
+export const getFormattedUserScheduleDetail = async (id: number) => {
+  const userdata = await Faculties.findByPk(id);
+  if (userdata) {
+    const userschedDetails = await getUserScheduleDetail(userdata.initials);
+    return formatSchedDetail(userdata.initials, userschedDetails);
+  }
+
+  return formatSchedDetail('', []);
 };
