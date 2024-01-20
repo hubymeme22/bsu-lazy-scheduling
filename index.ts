@@ -2,7 +2,6 @@ import express, { Express, Request, Response } from 'express';
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
-import authChecker from './middlewares/auth-check';
 import apiRoute from './routes/api';
 import authRoute from './routes/auth';
 import dotenv from 'dotenv';
@@ -17,7 +16,6 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use(authRoute);
-// app.use('/api', authChecker, apiRoute);
 app.use('/api', apiRoute);
 
 app.get('/', (req: Request, res: Response) => {

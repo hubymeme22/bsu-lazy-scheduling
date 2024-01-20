@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
 import { requestHandler } from "../utils";
+
 import * as loginservice from "../services/auth.service";
 import * as sessionservice from "../services/sessions.service";
 
 export const login = (req: Request, res: Response) => {
   requestHandler(res, async () => {
     const { username, password } = req.body;
-    res.json({token: await loginservice.login(username, password)});
+    res.json(await loginservice.login(username, password));
   });
 };
 

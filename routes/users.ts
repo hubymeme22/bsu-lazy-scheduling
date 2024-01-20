@@ -6,10 +6,6 @@ router.get('/', async (req: Request, res: Response) => {
   getAllUsers(res);
 });
 
-router.get('/hidden-initialize-account', (req: Request, res: Response) => {
-  initializeEmptyUser(res);
-});
-
 router.post('/register', async (req: Request, res: Response) => {
   createUser(req, res);
 });
