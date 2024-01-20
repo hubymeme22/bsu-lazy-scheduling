@@ -1,6 +1,9 @@
 import Schedules from "../../db/models/Scheduling";
 import Faculties from "../../db/models/Faculties";
+import SchedDetails from "../../db/models/SchedDetails";
+
 import { FormattedSched, ScheduleInterface } from "../../db/models/Scheduling";
+import { SchedDetailsInterface } from "../../db/models/SchedDetails";
 import { DAY_TYPE, TIME_TYPE } from "../utils";
 import { Op } from "sequelize";
 
@@ -104,6 +107,34 @@ export const bulkScheduleCreate = async (schedule: ScheduleInterface[]) => {
 
   await Schedules.destroy({ where: { initials: schedule[0].initials } });
   await Schedules.bulkCreate(schedule);
+
+  // creates a schedules for each sched
+  await SchedDetails.destroy({ where: { initials: schedule[0].initials } });
+  const formattedEven: SchedDetailsInterface[] = schedule.map(sched => {
+    return {
+      initials: sched.initials,
+      section: sched.section,
+      student_count: 0,
+      subject: sched.subject,
+      time: sched.time,
+      type: 'even'
+    }
+  });
+
+  const formattedOdd: SchedDetailsInterface[] = schedule.map(sched => {
+    return {
+      initials: sched.initials,
+      section: sched.section,
+      student_count: 0,
+      subject: sched.subject,
+      time: sched.time,
+      type: 'odd'
+    }
+  });
+
+  // cursed implementation, but, what can i do? time is ticking lol
+  await SchedDetails.bulkCreate(formattedEven);
+  await SchedDetails.bulkCreate(formattedOdd);
   return await Schedules.findAndCountAll();
 };
 
