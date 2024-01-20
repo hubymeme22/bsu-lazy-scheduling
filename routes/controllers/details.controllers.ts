@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { requestHandler } from "../utils";
 
 import * as service from "../services/details.service";
+import * as schedDetailService from "../services/schedule-details.service";
 
 export const getAllRooms = (res: Response) => {
   requestHandler(res, async () => {
@@ -20,3 +21,9 @@ export const getAllSections = (res: Response) => {
     res.json(await service.getAllSections());
   });
 };
+
+export const getScheduleDetails = (req: Request, res: Response) => {
+  requestHandler(res, async () => {
+    res.json(await schedDetailService.getFormattedUserScheduleDetail(req.params.initials));
+  });
+}
