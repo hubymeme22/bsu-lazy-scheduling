@@ -23,3 +23,9 @@ export const editFaculty = (req: Request, res: Response) => {
     res.json(dbResponse);
   });
 };
+
+export const removeFaculty = (req: Request, res: Response) => {
+  requestHandler(res, async () => {
+    res.json(await service.deleteFaculty(parseInt(req.params.id)));
+  });
+};

@@ -22,3 +22,9 @@ export const getAllUsers = (res: Response) => {
     res.json(await service.getAllUsers());
   });
 };
+
+export const removeUser = (req: Request, res: Response) => {
+  requestHandler(res, async () => {
+    res.json(await service.deleteUserById(parseInt(req.params.id)));
+  })
+};
