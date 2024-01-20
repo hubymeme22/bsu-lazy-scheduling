@@ -10,7 +10,7 @@ router.post('/add', (req: Request, res: Response) => {
   createFaculty(req, res);
 });
 
-router.put('/edit', (req: Request, res: Response) => {
+router.put('/update', (req: Request, res: Response) => {
   editFaculty(req, res);
 });
 

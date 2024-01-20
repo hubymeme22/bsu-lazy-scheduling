@@ -24,7 +24,9 @@ export const deleteUserById = async (id: number) => {
 }
 
 export const updateUserById = async (id: number, updatedUserData: UsersAttributes) => {
-  return await Users.update(updatedUserData, {
+  await Users.update(updatedUserData, {
     where: { id }
   });
+
+  return getUserById(id);
 }

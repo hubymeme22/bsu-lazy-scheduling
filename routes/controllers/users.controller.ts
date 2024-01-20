@@ -10,14 +10,15 @@ export const createUser = (req: Request, res: Response) => {
   });
 };
 
+export const updateUser = (req: Request, res: Response) => {
+  requestHandler(res, async () => {
+    const { username, password, id } = req.body;
+    res.json(await service.updateUserById(parseInt(id), { username, password }));
+  });
+};
+
 export const getAllUsers = (res: Response) => {
   requestHandler(res, async () => {
     res.json(await service.getAllUsers());
   });
 };
-
-export const initializeEmptyUser = (res: Response) => {
-  requestHandler(res, async () => {
-    res.json(await service.createUser('', ''));
-  });
-}
