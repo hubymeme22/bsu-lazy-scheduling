@@ -75,7 +75,15 @@ export const conflictCheck = async (schedule: ScheduleInterface) => {
     }
   });
 
-  if (scheduleMatch.count > 0) {
+  const sectionConflict = await Schedules.findAndCountAll({
+    where: {
+      section: schedule.section,
+      time: schedule.time,
+      day: schedule.day
+    }
+  });
+
+  if (scheduleMatch.count > 0 || sectionConflict.count > 0) {
     schedule.conflicted = true;
     return {
       conflicted: true,
