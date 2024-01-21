@@ -11,7 +11,7 @@ export const getFacultyByInitials = async (initials: string) => {
 
 export const getAllFaculties = async () => {
   return await Faculties.findAndCountAll();
-}
+};
 
 export const createFaculty = async (name: string, initials: string) => {
   const faculty = await Faculties.create({ name, initials });

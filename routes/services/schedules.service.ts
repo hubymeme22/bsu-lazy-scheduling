@@ -95,7 +95,8 @@ export const conflictCheck = async (schedule: ScheduleInterface) => {
           time: { [Op.not]: '' },
           day: { [Op.not]: '' },
         }
-      ]
+      ],
+      initials: { [Op.not]: schedule.initials }
     }
   });
 
