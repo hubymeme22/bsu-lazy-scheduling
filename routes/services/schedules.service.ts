@@ -68,7 +68,14 @@ export const conflictCheck = async (schedule: ScheduleInterface) => {
   const { time, day, room } = schedule;
   const scheduleMatch = await Schedules.findAndCountAll({
     where: {
-      time, day, room,
+      [Op.and]: [
+        {time, day, room},
+        {
+          time: { [Op.not]: '' } ,
+          day: { [Op.not]: '' } ,
+          room: { [Op.not]: '' } ,
+        }
+      ],
       initials: {
         [Op.not]: schedule.initials
       }
@@ -77,9 +84,18 @@ export const conflictCheck = async (schedule: ScheduleInterface) => {
 
   const sectionConflict = await Schedules.findAndCountAll({
     where: {
-      section: schedule.section,
-      time: schedule.time,
-      day: schedule.day
+      [Op.and]: [
+        {
+          section: schedule.section,
+          time: schedule.time,
+          day: schedule.day
+        },
+        {
+          section: { [Op.not]: '' },
+          time: { [Op.not]: '' },
+          day: { [Op.not]: '' },
+        }
+      ]
     }
   });
 
@@ -98,7 +114,6 @@ export const conflictCheck = async (schedule: ScheduleInterface) => {
 };
 
 export const bulkScheduleCreate = async (schedule: ScheduleInterface[]) => {
-  schedule = schedule.filter(sched => (sched.subject !== '' && sched.room !== ''))
   if (schedule.length === 0)
     return await Schedules.findAndCountAll();
 

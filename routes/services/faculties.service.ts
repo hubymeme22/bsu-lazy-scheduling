@@ -1,5 +1,5 @@
 import Faculties from "../../db/models/Faculties";
-import Schedules from "../../db/models/Scheduling";
+import Schedules, { ScheduleInterface } from "../../db/models/Scheduling";
 import { FacultiesInterface } from "../../db/models/Faculties";
 import { DAY_TYPE, TIME_TYPE } from "../utils";
 
@@ -23,15 +23,23 @@ export const initializeFacultySchedule = async (initials: string) => {
   const faculty = await Faculties.findOne({ where: { initials } });
   if (!faculty) throw ['Nonexistent initial', 404];
 
-  await Schedules.bulkCreate([{
-    day: DAY_TYPE[0],
-    time: TIME_TYPE[0],
-    initials: initials,
-    room: '',
-    section: '',
-    subject: '',
-    time_type: 'am'
-  }]);
+  // generate initial empty schedules for all users
+  const initialSchedules: ScheduleInterface[] = [];
+  for (let i = 0, id=0; i < DAY_TYPE.length; i++) {
+    for (let j = 0; j < TIME_TYPE.length; j++, id++) {
+      initialSchedules.push({
+        day: DAY_TYPE[i],
+        time: TIME_TYPE[j],
+        initials: initials,
+        room: '',
+        section: '',
+        subject: '',
+        time_type: 'am'
+      });
+    }
+  }
+
+  await Schedules.bulkCreate(initialSchedules);
 };
 
 export const deleteFaculty = async (initials: string) => {
