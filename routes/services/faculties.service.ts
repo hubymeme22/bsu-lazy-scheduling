@@ -46,6 +46,7 @@ export const deleteFaculty = async (initials: string) => {
   const faculty = await getFacultyByInitials(initials);
   if (faculty) {
     await Faculties.destroy({ where: { initials } });
+    await Schedules.destroy({ where: { initials } });
     return faculty;
   }
 
