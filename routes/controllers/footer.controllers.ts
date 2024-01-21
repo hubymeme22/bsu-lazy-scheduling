@@ -7,7 +7,7 @@ import * as service from "../services/footer-details.service";
 interface FooterDetailsRequestFormat {
   id: number;
   total: ITotal;
-  overallSummary: IOverallSummary,
+  summary: IOverallSummary,
 }
 
 export const getFooterById = async (req: Request, res: Response) => {
@@ -18,7 +18,7 @@ export const getFooterById = async (req: Request, res: Response) => {
 
 export const createFooterDetails = async (req: Request, res: Response) => {
   requestHandler(res, async () => {
-    const { id, total, overallSummary }: FooterDetailsRequestFormat = req.body;
-    res.json(await service.createFooterDetail(id, total, overallSummary));
+    const { id, total, summary }: FooterDetailsRequestFormat = req.body;
+    res.json(await service.createFooterDetail(id, total, summary));
   });
 };

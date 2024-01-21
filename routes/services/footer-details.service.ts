@@ -34,6 +34,9 @@ export const createFooterDetail = async (facultyid: number, total: ITotal, overa
   const facultydata = await Faculties.findByPk(facultyid);
   if (!facultydata) throw ['FacultyID provided does not exist', 404];
 
+  console.log(total);
+  console.log(overallSummary);
+
   const formatted: FooterDetailsInterface = {
     initials: facultydata.initials,
     academic_rank: overallSummary.academicRank,
@@ -48,6 +51,8 @@ export const createFooterDetail = async (facultyid: number, total: ITotal, overa
     regular_load: overallSummary.regularLoad,
     teaching_hours: total.teachingHours.join(',')
   }
+
+  console.log(formatted);
 
   await FooterDetails.create(formatted);
   return getFooterDetailById(facultyid);
