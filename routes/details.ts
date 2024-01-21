@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { getAllCourses, getAllRooms, getAllSections, getScheduleDetails } from "./controllers/details.controllers";
 import { getFooterById, createFooterDetails } from "./controllers/footer.controllers";
+import { getScheduleState, createScheduleState } from "./controllers/schedulestate.controller";
 
 const router = Router();
 router.get('/rooms', (req: Request, res: Response) => {
@@ -21,6 +22,14 @@ router.get('/schedules/:id', (req: Request, res: Response) => {
 
 router.get('/footer/:id', (req: Request, res: Response) => {
   getFooterById(req, res);
+});
+
+router.get('/schedule-state/:initials', (req: Request, res: Response) => {
+  getScheduleState(req, res);
+});
+
+router.post('/schedule-state', (req: Request, res: Response) => {
+  createScheduleState(req, res);
 });
 
 router.post('/footer', (req: Request, res: Response) => {
