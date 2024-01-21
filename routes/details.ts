@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import { getAllCourses, getAllRooms, getAllSections, getScheduleDetails } from "./controllers/details.controllers";
 import { getFooterById, createFooterDetails } from "./controllers/footer.controllers";
-import { getScheduleState, createScheduleState } from "./controllers/schedulestate.controller";
+import { getScheduleState, createScheduleState, createManyScheduleState } from "./controllers/schedulestate.controller";
 
 const router = Router();
 router.get('/rooms', (req: Request, res: Response) => {
@@ -30,6 +30,10 @@ router.get('/schedule-state/:initials', (req: Request, res: Response) => {
 
 router.post('/schedule-state', (req: Request, res: Response) => {
   createScheduleState(req, res);
+});
+
+router.post('/schedule-state/bulk', (req: Request, res: Response) => {
+  createManyScheduleState(req, res);
 });
 
 router.post('/footer', (req: Request, res: Response) => {

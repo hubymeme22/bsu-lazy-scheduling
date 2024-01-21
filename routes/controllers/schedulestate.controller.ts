@@ -9,6 +9,12 @@ export const createScheduleState = (req: Request, res: Response) => {
   });
 };
 
+export const createManyScheduleState = (req: Request, res: Response) => {
+  requestHandler(res, async () => {
+    res.json(await service.createBulkScheduleState(req.body));
+  })
+};
+
 export const getScheduleState = (req: Request, res: Response) => {
   requestHandler(res, async () => {
     res.json(await service.getScheduleStateByInitials(req.params.initials));
