@@ -100,7 +100,8 @@ export const conflictCheck = async (schedule: ScheduleInterface) => {
     }
   });
 
-  if (scheduleMatch.count > 0 || sectionConflict.count > 0) {
+  const scheduleOnlineRemoved = scheduleMatch.rows.filter(sched => sched.room !== 'OL');
+  if (scheduleOnlineRemoved.length > 0 || sectionConflict.count > 0) {
     schedule.conflicted = true;
     return {
       conflicted: true,

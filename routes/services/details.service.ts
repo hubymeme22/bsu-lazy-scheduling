@@ -1,7 +1,13 @@
+import { Op } from "sequelize";
 import Schedules from "../../db/models/Scheduling";
 
 export const getAllRooms = async () => {
   const roomParsed = await Schedules.findAll({
+    where: {
+      room: {
+        [Op.not]: 'OL'
+      }
+    },
     attributes: ['room']
   });
 
