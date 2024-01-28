@@ -45,6 +45,13 @@ export const bulkFormattedScheduleCreate = (req: Request, res: Response) => {
   });
 };
 
+export const bulkFormattedClassScheduleCreate = (req: Request, res: Response) => {
+  requestHandler(res, async () => {
+    const { rows } = req.body;
+    res.json(await service.bulkFormattedScheduleCreate(rows as FormattedSched[], true));
+  });
+};
+
 export const updateSingleSchedule = (req: Request, res: Response) => {
   requestHandler(res, async () => {
     const update: ScheduleInterface = req.body.update;

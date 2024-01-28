@@ -5,7 +5,8 @@ import {
   getFormattedSchedulesByFacultyId,
   getFormattedSchedulesBySection,
   getFormattedSchedulesByRoom,
-  updateSingleSchedule
+  updateSingleSchedule,
+  bulkFormattedClassScheduleCreate
 } from "./controllers/schedules.controller";
 
 const router = Router();
@@ -27,6 +28,10 @@ router.post('/bulk', (req: Request, res: Response) => {
 
 router.post('/bulk/formatted', (req: Request, res: Response) => {
   bulkFormattedScheduleCreate(req, res);
+});
+
+router.post('/bulk/formatted/class-schedule', (req: Request, res: Response) => {
+  bulkFormattedClassScheduleCreate(req, res);
 });
 
 router.put('/update-one', (req: Request, res: Response) => {

@@ -33,7 +33,7 @@ const formatData = (schedules: ScheduleInterface[], isRandomUser?: boolean, conf
         conflicted: conflicted ? sched.conflicted : undefined
       };
     });
-    
+
     return { time, schedules: formattedSchedules };
   });
   
@@ -163,7 +163,29 @@ export const bulkScheduleCreate = async (schedule: ScheduleInterface[]) => {
   return await Schedules.findAndCountAll();
 };
 
-export const bulkFormattedScheduleCreate = async (schedule: FormattedSched[]) => {
+// overwrites the schedules with matching day and time
+export const bulkCreateCleaner = async (schedule: ScheduleInterface[]) => {
+  if (schedule.length === 0) return {count: 0, rows: []};
+
+  const indivSchedule = schedule.filter(sched => (sched.day !== '' && sched.room !== '' && sched.time !== ''));
+  for (let i = 0; i < indivSchedule.length; i++) {
+    await Schedules.destroy({
+      where: {
+        initials: schedule[i].initials,
+        day: schedule[i].day,
+        time: schedule[i].time
+      }
+    });
+
+    await Schedules.create(schedule[i]);
+  }
+
+  return Schedules.findAndCountAll({
+    where: { section: schedule[0].section }
+  })
+};
+
+export const bulkFormattedScheduleCreate = async (schedule: FormattedSched[], isClassSched: boolean=false) => {
   schedule = schedule.filter(sched => sched.schedules.length > 0);
   const formatSchedule = schedule.map(sched => {
     return sched.schedules.map(isched => {
@@ -184,7 +206,9 @@ export const bulkFormattedScheduleCreate = async (schedule: FormattedSched[]) =>
     for (let j = 0; j < formatSchedule[0].length; j++)
       oneDimensionSched.push(formatSchedule[i][j]);
 
-  return await bulkScheduleCreate(oneDimensionSched);
+  return isClassSched
+    ? await bulkCreateCleaner(oneDimensionSched)
+    : await bulkScheduleCreate(oneDimensionSched);
 };
 
 export const getSchedulesByFacultyId = async (faculty_id: number) => {
