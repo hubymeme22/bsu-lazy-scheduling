@@ -20,7 +20,7 @@ interface FormattedData {
   schedules: Sched[];
 }
 
-const formatData = (schedules: ScheduleInterface[], isRandomUser?: boolean, conflicted?: boolean) => {
+const formatData = (schedules: ScheduleInterface[], isRandomUser?: boolean, conflicted?: boolean, isStaticSection?: boolean) => {
   const formattedData: FormattedData[] = TIME_TYPE.map(time => {
     const filteredSchedules: ScheduleInterface[] = schedules.filter(sched => sched.time === time);
     const formattedSchedules = filteredSchedules.map(sched => {
@@ -37,8 +37,9 @@ const formatData = (schedules: ScheduleInterface[], isRandomUser?: boolean, conf
     return { time, schedules: formattedSchedules };
   });
   
-  // first user
+  // first user & first sched
   const firstinitial = schedules.length > 0 ? schedules[0].initials : '';
+  const firstSection = (schedules.length > 0 && isStaticSection) ? schedules[0].section : '';
 
   // prototype solution
   for (let i = 0; i < formattedData.length; i++) {
@@ -53,7 +54,7 @@ const formatData = (schedules: ScheduleInterface[], isRandomUser?: boolean, conf
         course: '',
         initials: isRandomUser ? '' : firstinitial,
         room: '',
-        section: ''
+        section: firstSection
       });
 
     formattedData[i].schedules.sort((a: Sched, b: Sched) => {
@@ -249,7 +250,7 @@ export const getFormattedSchedulesByRoom = async (room: string) => {
 
 export const getFormattedSchedulesBySection = async (section: string) => {
   const schedules = await getSchedulesBySection(section);
-  return formatData(schedules.rows, true);
+  return formatData(schedules.rows, true, false, true);
 };
 
 export const updateSchedule = async (day: string, time: string, update: ScheduleInterface) => {
