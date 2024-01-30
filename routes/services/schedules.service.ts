@@ -178,12 +178,12 @@ export const bulkCreateCleaner = async (schedule: ScheduleInterface[]) => {
       }
     });
 
-    await Schedules.create(schedule[i]);
+    await Schedules.create(indivSchedule[i]);
   }
 
   return Schedules.findAndCountAll({
     where: { section: schedule[0].section }
-  })
+  });
 };
 
 export const bulkFormattedScheduleCreate = async (schedule: FormattedSched[], isClassSched: boolean=false) => {
