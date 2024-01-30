@@ -65,6 +65,14 @@ const formatData = (schedules: ScheduleInterface[], isRandomUser?: boolean, conf
   return formattedData;
 };
 
+// compares the values of the schedule if already existing
+export const ignorable = async (schedule: ScheduleInterface) => {
+  const { initials, time, day, room } = schedule;
+  return !!(await Schedules.findOne({
+    where: { initials, time, day, room }
+  }));
+};
+
 export const conflictCheck = async (schedule: ScheduleInterface) => {
   const { time, day, room } = schedule;
   const scheduleMatch = await Schedules.findAndCountAll({
@@ -168,19 +176,25 @@ export const bulkScheduleCreate = async (schedule: ScheduleInterface[]) => {
 export const bulkCreateCleaner = async (schedule: ScheduleInterface[]) => {
   if (schedule.length === 0) return {count: 0, rows: []};
 
-  const indivSchedule = schedule.filter(sched => (sched.day !== '' && sched.room !== '' && sched.time !== ''));
-  for (let i = 0; i < indivSchedule.length; i++) {
-    await Schedules.destroy({
-      where: {
-        initials: schedule[i].initials,
-        day: schedule[i].day,
-        time: schedule[i].time
-      }
-    });
-
-    await Schedules.create(indivSchedule[i]);
+  const inputSched: ScheduleInterface[] = schedule.filter(sched => (sched.day !== '' && sched.room !== '' && sched.time !== ''));
+  const indivSchedule: ScheduleInterface[] = [];
+  for (let i = 0; i < inputSched.length; i++) {
+    if (!(await ignorable(inputSched[i])))
+      indivSchedule.push(inputSched[i]);
   }
 
+  const conflicts = [];
+  for (let i = 0; i < indivSchedule.length; i++) {
+    const conflict = await conflictCheck(indivSchedule[i]);
+    conflicts.push(conflict);
+  }
+
+  if (conflicts.length > 0) {
+    const formattedConflict: ScheduleInterface[] = conflicts.map(conflict => conflict.schedule);
+    throw [{ conflicts, formattedConflict: formatData(formattedConflict, false, true) }, 400];
+  }
+
+  await Schedules.bulkCreate(indivSchedule);
   return Schedules.findAndCountAll({
     where: { section: schedule[0].section }
   });
