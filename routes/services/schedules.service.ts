@@ -156,36 +156,37 @@ export const bulkScheduleCreate = async (schedule: ScheduleInterface[]) => {
     throw [{ conflicts: allConflicts, formattedConflict: formatData(formattedConflict, false, true) }, 400];
   }
 
-  await Schedules.destroy({ where: { initials: schedule[0].initials } });
+  await Schedules.destroy({ where: { initials: schedule[0].initials }});
+  console.log(schedule);
   await Schedules.bulkCreate(schedule);
 
-  // creates a schedules for each sched
-  await SchedDetails.destroy({ where: { initials: schedule[0].initials } });
-  const formattedEven: SchedDetailsInterface[] = schedule.map(sched => {
-    return {
-      initials: sched.initials,
-      section: sched.section,
-      student_count: 0,
-      subject: sched.subject,
-      time: sched.time,
-      type: 'even'
-    }
-  });
+  // // creates a schedules for each sched
+  // await SchedDetails.destroy({ where: { initials: schedule[0].initials } });
+  // const formattedEven: SchedDetailsInterface[] = schedule.map(sched => {
+  //   return {
+  //     initials: sched.initials,
+  //     section: sched.section,
+  //     student_count: 0,
+  //     subject: sched.subject,
+  //     time: sched.time,
+  //     type: 'even'
+  //   }
+  // });
 
-  const formattedOdd: SchedDetailsInterface[] = schedule.map(sched => {
-    return {
-      initials: sched.initials,
-      section: sched.section,
-      student_count: 0,
-      subject: sched.subject,
-      time: sched.time,
-      type: 'odd'
-    }
-  });
+  // const formattedOdd: SchedDetailsInterface[] = schedule.map(sched => {
+  //   return {
+  //     initials: sched.initials,
+  //     section: sched.section,
+  //     student_count: 0,
+  //     subject: sched.subject,
+  //     time: sched.time,
+  //     type: 'odd'
+  //   }
+  // });
 
-  // cursed implementation, but, what can i do? time is ticking lol
-  await SchedDetails.bulkCreate(formattedEven);
-  await SchedDetails.bulkCreate(formattedOdd);
+  // // cursed implementation, but, what can i do? time is ticking lol
+  // await SchedDetails.bulkCreate(formattedEven);
+  // await SchedDetails.bulkCreate(formattedOdd);
   return await Schedules.findAndCountAll();
 };
 
@@ -194,9 +195,25 @@ export const bulkCreateCleaner = async (schedule: ScheduleInterface[]) => {
   if (schedule.length === 0) return {count: 0, rows: []};
 
   const inputSched: ScheduleInterface[] = schedule.filter(sched => (sched.day !== '' && sched.room !== '' && sched.time !== ''));
-  const indivSchedule: ScheduleInterface[] = [];
+  let indivSchedule: ScheduleInterface[] = [];
+
+  // auto remove existing schedules
+  const deletables = inputSched.filter(sched => sched.initials === 'DEL');
+  for (let i = 0; i < deletables.length; i++) {
+    Schedules.update({ section: '', subject: '', room: '' },
+      {
+        where: {
+          day: deletables[i].day,
+          time: deletables[i].time,
+          subject: deletables[i].subject,
+          section: deletables[i].section,
+          room: deletables[i].room,
+        }
+      });
+  }
+
   for (let i = 0; i < inputSched.length; i++) {
-    if (!(await ignorable(inputSched[i])))
+    if (!(await ignorable(inputSched[i])) && inputSched[i].initials !== 'DEL')
       indivSchedule.push(inputSched[i]);
   }
 
