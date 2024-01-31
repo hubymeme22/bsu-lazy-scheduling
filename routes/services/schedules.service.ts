@@ -78,6 +78,8 @@ export const roomReplacable = async (schedule: ScheduleInterface) => {
   const { initials, time, day, subject } = schedule;
   return !!(await Schedules.findOne({
     where: { initials, time, day, subject }
+  })) || !!(await Schedules.findOne({
+    where: { day, time, initials }
   }));
 };
 
@@ -103,9 +105,6 @@ export const conflictCheck = async (schedule: ScheduleInterface) => {
     raw: true
   });
 
-  console.log('--schedule match--');
-  console.log(scheduleMatch);
-  console.log('-- done --');
 
   // checking if some prof has already assigned the section
   // in the given time and day
@@ -204,8 +203,8 @@ export const bulkCreateCleaner = async (schedule: ScheduleInterface[]) => {
   // checks for replacable rooms and destroy
   for (let i = 0; i < indivSchedule.length; i++) {
     if ((await roomReplacable(indivSchedule[i]))) {
-      const { day, time, subject, initials } = indivSchedule[i];
-      Schedules.destroy({ where: { day, time, subject, initials } });
+      const { day, time, initials } = indivSchedule[i];
+      Schedules.destroy({ where: { day, time, initials } });
     }
   }
 
