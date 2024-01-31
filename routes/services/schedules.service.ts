@@ -67,14 +67,25 @@ const formatData = (schedules: ScheduleInterface[], isRandomUser?: boolean, conf
 
 // compares the values of the schedule if already existing
 export const ignorable = async (schedule: ScheduleInterface) => {
-  const { initials, time, day, room } = schedule;
+  const { initials, time, day, room, subject } = schedule;
   return !!(await Schedules.findOne({
-    where: { initials, time, day, room }
+    where: { initials, time, day, room, subject }
+  }));
+};
+
+// checks if the section's room will be replaced
+export const roomReplacable = async (schedule: ScheduleInterface) => {
+  const { initials, time, day, subject } = schedule;
+  return !!(await Schedules.findOne({
+    where: { initials, time, day, subject }
   }));
 };
 
 export const conflictCheck = async (schedule: ScheduleInterface) => {
   const { time, day, room } = schedule;
+
+  // logic for checking if some section is already using the room 
+  // ignoring the sections with empty strings
   const scheduleMatch = await Schedules.findAndCountAll({
     where: {
       [Op.and]: [
@@ -88,9 +99,16 @@ export const conflictCheck = async (schedule: ScheduleInterface) => {
       initials: {
         [Op.not]: schedule.initials
       }
-    }
+    },
+    raw: true
   });
 
+  console.log('--schedule match--');
+  console.log(scheduleMatch);
+  console.log('-- done --');
+
+  // checking if some prof has already assigned the section
+  // in the given time and day
   const sectionConflict = await Schedules.findAndCountAll({
     where: {
       [Op.and]: [
@@ -183,10 +201,18 @@ export const bulkCreateCleaner = async (schedule: ScheduleInterface[]) => {
       indivSchedule.push(inputSched[i]);
   }
 
+  // checks for replacable rooms and destroy
+  for (let i = 0; i < indivSchedule.length; i++) {
+    if ((await roomReplacable(indivSchedule[i]))) {
+      const { day, time, subject, initials } = indivSchedule[i];
+      Schedules.destroy({ where: { day, time, subject, initials } });
+    }
+  }
+
   const conflicts = [];
   for (let i = 0; i < indivSchedule.length; i++) {
     const conflict = await conflictCheck(indivSchedule[i]);
-    conflicts.push(conflict);
+    conflict.conflicted ? conflicts.push(conflict) : null;
   }
 
   if (conflicts.length > 0) {
