@@ -157,36 +157,7 @@ export const bulkScheduleCreate = async (schedule: ScheduleInterface[]) => {
   }
 
   await Schedules.destroy({ where: { initials: schedule[0].initials }});
-  console.log(schedule);
   await Schedules.bulkCreate(schedule);
-
-  // // creates a schedules for each sched
-  // await SchedDetails.destroy({ where: { initials: schedule[0].initials } });
-  // const formattedEven: SchedDetailsInterface[] = schedule.map(sched => {
-  //   return {
-  //     initials: sched.initials,
-  //     section: sched.section,
-  //     student_count: 0,
-  //     subject: sched.subject,
-  //     time: sched.time,
-  //     type: 'even'
-  //   }
-  // });
-
-  // const formattedOdd: SchedDetailsInterface[] = schedule.map(sched => {
-  //   return {
-  //     initials: sched.initials,
-  //     section: sched.section,
-  //     student_count: 0,
-  //     subject: sched.subject,
-  //     time: sched.time,
-  //     type: 'odd'
-  //   }
-  // });
-
-  // // cursed implementation, but, what can i do? time is ticking lol
-  // await SchedDetails.bulkCreate(formattedEven);
-  // await SchedDetails.bulkCreate(formattedOdd);
   return await Schedules.findAndCountAll();
 };
 
