@@ -145,6 +145,20 @@ export const bulkScheduleCreate = async (schedule: ScheduleInterface[]) => {
   if (schedule.length === 0)
     return await Schedules.findAndCountAll();
 
+  // for delete functionality
+  for (let i = 0; i < schedule.length; i++) {
+    const sched = schedule[i];
+    if (sched.section === '' || sched.room === '' || sched.subject === '') {
+      await Schedules.destroy({
+        where: {
+          day: sched.day,
+          time: sched.time,
+          initials: sched.initials
+        }
+      });
+    }
+  }
+
   schedule = schedule.filter(sched => (sched.day !== '' && sched.room !== '' && sched.time !== '') || sched.initials === '');
   const conflicts = [];
   for (let i = 0; i < schedule.length; i++) {
