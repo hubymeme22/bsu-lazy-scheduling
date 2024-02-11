@@ -145,6 +145,7 @@ export const bulkScheduleCreate = async (schedule: ScheduleInterface[]) => {
   if (schedule.length === 0)
     return await Schedules.findAndCountAll();
 
+  schedule = schedule.filter(sched => (sched.day !== '' && sched.room !== '' && sched.time !== '') || sched.initials === '');
   const conflicts = [];
   for (let i = 0; i < schedule.length; i++) {
       conflicts.push(await conflictCheck(schedule[i]));
