@@ -23,6 +23,12 @@ module.exports = {
       status: {
         type: Sequelize.STRING
       },
+      semester: {
+        type: Sequelize.STRING
+      },
+      year: {
+        type: Sequelize.INTEGER
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

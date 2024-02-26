@@ -2,6 +2,7 @@ import Faculties from "../../db/models/Faculties";
 import Schedules, { ScheduleInterface } from "../../db/models/Scheduling";
 import { FacultiesInterface } from "../../db/models/Faculties";
 import { DAY_TYPE, TIME_TYPE } from "../utils";
+import { getAll } from "./form-details.service";
 
 export const getFacultyByInitials = async (initials: string) => {
   return await Faculties.findOne({
@@ -23,6 +24,8 @@ export const initializeFacultySchedule = async (initials: string) => {
   const faculty = await Faculties.findOne({ where: { initials } });
   if (!faculty) throw ['Nonexistent initial', 404];
 
+  const currentSet = getAll();
+
   // generate initial empty schedules for all users
   const initialSchedules: ScheduleInterface[] = [];
   for (let i = 0, id=0; i < DAY_TYPE.length; i++) {
@@ -34,7 +37,9 @@ export const initializeFacultySchedule = async (initials: string) => {
         room: '',
         section: '',
         subject: '',
-        time_type: 'am'
+        time_type: 'am',
+        year: currentSet.academic_year,
+        semester: currentSet.semester
       });
     }
   }

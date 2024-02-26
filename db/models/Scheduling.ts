@@ -11,17 +11,19 @@ export interface ScheduleInterface {
   time: string;
   time_type: string;
   initials: string;
+  year: number;
+  semester: string;
 }
 
 export interface FormattedSched {
   time: string;
-  schedules: [{
+  schedules: {
     day: string,
     course: string,
     room: string,
     section: string,
     initials: string;
-  }]
+  }[];
 }
 
 class Schedules extends Model<ScheduleInterface> {
@@ -33,6 +35,8 @@ class Schedules extends Model<ScheduleInterface> {
   public section!: string;
   public subject!: string;
   public initials!: string;
+  public year!: number;
+  public semester!: string;
 }
 
 Schedules.init({
@@ -43,6 +47,8 @@ Schedules.init({
   time: DataTypes.STRING,
   time_type: DataTypes.STRING,
   initials: DataTypes.STRING,
+  semester: DataTypes.STRING,
+  year:  DataTypes.NUMBER,
 }, { sequelize: sequelizeConnection, modelName: 'Schedules'});
 
 export default Schedules;

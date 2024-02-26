@@ -1,9 +1,7 @@
 import Schedules from "../../db/models/Scheduling";
 import Faculties from "../../db/models/Faculties";
-import SchedDetails from "../../db/models/SchedDetails";
 
 import { FormattedSched, ScheduleInterface } from "../../db/models/Scheduling";
-import { SchedDetailsInterface } from "../../db/models/SchedDetails";
 import { DAY_TYPE, TIME_TYPE } from "../utils";
 import { Op } from "sequelize";
 
@@ -30,7 +28,9 @@ const formatData = (schedules: ScheduleInterface[], isRandomUser?: boolean, conf
         room: sched.room,
         section: sched.section,
         initials: sched.initials,
-        conflicted: conflicted ? sched.conflicted : undefined
+        conflicted: conflicted ? sched.conflicted : undefined,
+        year: sched.year,
+        semester: sched.semester,
       };
     });
 
@@ -63,6 +63,26 @@ const formatData = (schedules: ScheduleInterface[], isRandomUser?: boolean, conf
   }
 
   return formattedData;
+};
+
+export const formatResponseData = (initials: string, schedule: ScheduleInterface[]) => {
+  const formatted = TIME_TYPE.map(time => {
+    return {
+      time,
+      schedules: DAY_TYPE.map(day => {
+        const matchedSchedule = schedule.find(val => val.day === day && val.time === time);
+        return (matchedSchedule ? matchedSchedule : {
+          initials: initials,
+          day,
+          course: '',
+          room: '',
+          section: '',
+        })
+      })
+    }
+  });
+
+  return formatted;
 };
 
 // compares the values of the schedule if already existing
@@ -228,7 +248,7 @@ export const bulkCreateCleaner = async (schedule: ScheduleInterface[]) => {
   });
 };
 
-export const bulkFormattedScheduleCreate = async (schedule: FormattedSched[], isClassSched: boolean=false) => {
+export const bulkFormattedScheduleCreate = async (year: number, semester: string, schedule: FormattedSched[], isClassSched: boolean=false) => {
   schedule = schedule.filter(sched => sched.schedules.length > 0);
   const formatSchedule = schedule.map(sched => {
     return sched.schedules.map(isched => {
@@ -239,7 +259,9 @@ export const bulkFormattedScheduleCreate = async (schedule: FormattedSched[], is
         room: isched.room,
         subject: isched.course,
         initials: isched.initials,
-        time_type: 'am'
+        time_type: 'am',
+        semester,
+        year,
       };
     });
   });
@@ -262,6 +284,24 @@ export const getSchedulesByFacultyId = async (faculty_id: number) => {
   return await Schedules.findAndCountAll({
     where: { initials: userdata.initials }
   });
+};
+
+export const getSchedulesByFacultyIdYearSem = async (faculty_id: number, year: number, semester: string) => {
+  console.log('this is called');
+  const userdata = await Faculties.findByPk(faculty_id);
+  if (!userdata)
+    throw ['User has been deleted', 400];
+
+  return formatResponseData(
+    userdata.initials,
+    (await Schedules.findAndCountAll({
+      where: {
+        initials: userdata.initials,
+        semester,
+        year,
+      }
+    })).rows
+  );
 };
 
 export const getSchedulesBySection = async (section: string) => {
