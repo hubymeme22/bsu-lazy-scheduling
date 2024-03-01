@@ -70,14 +70,20 @@ export const formatResponseData = (initials: string, schedule: ScheduleInterface
     return {
       time,
       schedules: DAY_TYPE.map(day => {
+        // find the matched schedule and format for response
         const matchedSchedule = schedule.find(val => val.day === day && val.time === time);
-        return (matchedSchedule ? matchedSchedule : {
+        if (matchedSchedule) {
+          matchedSchedule.course = matchedSchedule.subject;
+          return matchedSchedule;
+        }
+
+        return {
           initials: initials,
           day,
           course: '',
           room: '',
           section: '',
-        })
+        }
       })
     }
   });
@@ -178,11 +184,15 @@ export const bulkScheduleCreate = async (schedule: ScheduleInterface[]) => {
       });
     }
   }
-
+  
   schedule = schedule.filter(sched => (sched.day !== '' && sched.room !== '' && sched.time !== '') || sched.initials === '');
   const conflicts = [];
+  const uniqueInitials: string[] = [];
   for (let i = 0; i < schedule.length; i++) {
-      conflicts.push(await conflictCheck(schedule[i]));
+    if (!uniqueInitials.find(initial => initial === schedule[i].initials))
+      uniqueInitials.push(schedule[i].initials);
+
+    conflicts.push(await conflictCheck(schedule[i]));
   }
 
   const allConflicts = conflicts.filter(conflict => conflict.conflicted);
@@ -191,7 +201,7 @@ export const bulkScheduleCreate = async (schedule: ScheduleInterface[]) => {
     throw [{ conflicts: allConflicts, formattedConflict: formatData(formattedConflict, false, true) }, 400];
   }
 
-  await Schedules.destroy({ where: { initials: schedule[0].initials }});
+  await Schedules.destroy({ where: { initials: uniqueInitials }});
   await Schedules.bulkCreate(schedule);
   return await Schedules.findAndCountAll();
 };
@@ -322,7 +332,7 @@ export const getFormattedSchedulesByFacultyId = async (faculty_id: number) => {
     throw ['User has been deleted', 400];
 
   const schedules = await getSchedulesByFacultyId(faculty_id);
-  return formatData(schedules.rows);
+  return formatResponseData(userdata.initials, schedules.rows);
 };
 
 export const getFormattedSchedulesByRoom = async (room: string) => {

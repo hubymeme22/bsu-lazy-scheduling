@@ -4,6 +4,7 @@ import sequelizeConnection from "../connection";
 export interface ScheduleInterface {
   id?: number;
   conflicted?: boolean;
+  course?: string;
   day: string;
   section: string;
   room: string;
