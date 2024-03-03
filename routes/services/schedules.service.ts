@@ -110,14 +110,14 @@ export const roomReplacable = async (schedule: ScheduleInterface) => {
 };
 
 export const conflictCheck = async (schedule: ScheduleInterface) => {
-  const { time, day, room } = schedule;
+  const { time, day, room, semester } = schedule;
 
   // logic for checking if some section is already using the room 
   // ignoring the sections with empty strings
   const scheduleMatch = await Schedules.findAndCountAll({
     where: {
       [Op.and]: [
-        {time, day, room},
+        {time, day, room, semester},
         {
           time: { [Op.not]: '' } ,
           day: { [Op.not]: '' } ,
@@ -140,7 +140,8 @@ export const conflictCheck = async (schedule: ScheduleInterface) => {
         {
           section: schedule.section,
           time: schedule.time,
-          day: schedule.day
+          day: schedule.day,
+          semester: schedule.semester
         },
         {
           section: { [Op.not]: '' },
