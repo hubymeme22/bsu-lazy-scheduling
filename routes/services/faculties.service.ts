@@ -4,6 +4,10 @@ import { FacultiesInterface } from "../../db/models/Faculties";
 import { DAY_TYPE, TIME_TYPE } from "../utils";
 import { getAll } from "./form-details.service";
 
+const getFacultyById = async (id: number) => {
+  return Faculties.findByPk(id);
+};
+
 export const getFacultyByInitials = async (initials: string) => {
   return await Faculties.findOne({
     where: { initials }
@@ -58,8 +62,13 @@ export const deleteFaculty = async (initials: string) => {
   throw ['ID Provided does not exist', 404];
 };
 
-export const updateFaculty = async (initials: string, update: FacultiesInterface) => {
-  const faculty = await Faculties.update(update, { where: { initials } });
-  if (faculty) return getFacultyByInitials(initials);
+export const updateFaculty = async (id: number, update: FacultiesInterface) => {
+  const oldFacultyValue = await getFacultyById(id);
+  if (oldFacultyValue) {
+    await Schedules.update({ initials: update.initials }, { where: { initials: oldFacultyValue.initials } });
+    await Faculties.update(update, { where: { id } });
+    return await getFacultyById(id);
+  }
+
   throw ['ID Provided does not exist', 404];
 };

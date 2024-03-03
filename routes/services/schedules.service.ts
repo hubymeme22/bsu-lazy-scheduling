@@ -292,12 +292,12 @@ export const getSchedulesByFacultyId = async (faculty_id: number) => {
     throw ['User has been deleted', 400];
 
   return await Schedules.findAndCountAll({
-    where: { initials: userdata.initials }
+    where: { initials: userdata.initials },
+    raw: true
   });
 };
 
 export const getSchedulesByFacultyIdYearSem = async (faculty_id: number, year: number, semester: string) => {
-  console.log('this is called');
   const userdata = await Faculties.findByPk(faculty_id);
   if (!userdata)
     throw ['User has been deleted', 400];
@@ -309,7 +309,8 @@ export const getSchedulesByFacultyIdYearSem = async (faculty_id: number, year: n
         initials: userdata.initials,
         semester,
         year,
-      }
+      },
+      raw: true
     })).rows
   );
 };

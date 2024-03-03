@@ -18,8 +18,8 @@ export const getAllFaculties = (res: Response) => {
 
 export const editFaculty = (req: Request, res: Response) => {
   requestHandler(res, async () => {
-    const {name, initials} = req.body;
-    const dbResponse = await service.updateFaculty(initials, {name, initials});
+    const { name, initials, id } = req.body;
+    const dbResponse = await service.updateFaculty(id, {name, initials});
     res.json(dbResponse);
   });
 };
