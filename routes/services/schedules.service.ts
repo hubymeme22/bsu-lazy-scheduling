@@ -180,7 +180,9 @@ export const bulkScheduleCreate = async (schedule: ScheduleInterface[]) => {
         where: {
           day: sched.day,
           time: sched.time,
-          initials: sched.initials
+          initials: sched.initials,
+          semester: sched.semester,
+          year: sched.year,
         }
       });
     }
@@ -202,7 +204,10 @@ export const bulkScheduleCreate = async (schedule: ScheduleInterface[]) => {
     throw [{ conflicts: allConflicts, formattedConflict: formatData(formattedConflict, false, true) }, 400];
   }
 
-  await Schedules.destroy({ where: { initials: uniqueInitials }});
+  const semester = schedule[0].semester;
+  const year = schedule[0].year;
+
+  await Schedules.destroy({ where: { initials: uniqueInitials, year, semester }});
   await Schedules.bulkCreate(schedule);
   return await Schedules.findAndCountAll();
 };
@@ -225,6 +230,8 @@ export const bulkCreateCleaner = async (schedule: ScheduleInterface[]) => {
           subject: deletables[i].subject,
           section: deletables[i].section,
           room: deletables[i].room,
+          semester: deletables[i].semester,
+          year: deletables[i].year,
         }
       });
   }
@@ -237,8 +244,8 @@ export const bulkCreateCleaner = async (schedule: ScheduleInterface[]) => {
   // checks for replacable rooms and destroy
   for (let i = 0; i < indivSchedule.length; i++) {
     if ((await roomReplacable(indivSchedule[i]))) {
-      const { day, time, initials } = indivSchedule[i];
-      Schedules.destroy({ where: { day, time, initials } });
+      const { day, time, initials, semester, year } = indivSchedule[i];
+      Schedules.destroy({ where: { day, time, initials, semester, year } });
     }
   }
 
@@ -254,6 +261,9 @@ export const bulkCreateCleaner = async (schedule: ScheduleInterface[]) => {
   }
 
   await Schedules.bulkCreate(indivSchedule);
+
+  // idk what was i thinking while implementing this
+  // but nah, ill not dare to move this one
   return Schedules.findAndCountAll({
     where: { section: schedule[0].section }
   });
