@@ -32,6 +32,13 @@ export const getFormattedSchedulesBySection = (req: Request, res: Response) => {
   });
 };
 
+export const getFormattedSchedulesBySectionIdYearSem = (req: Request, res: Response) => {
+  requestHandler(res, async () => {
+    const { section_code, year, semester } = req.params;
+    res.json(await service.getFormattedSchedulesBySectionIdYearSem(section_code, parseInt(year), semester));
+  });
+};
+
 export const getFormattedSchedulesByRoom = (req: Request, res: Response) => {
   requestHandler(res, async () => {
     const { room_code } = req.params;
@@ -39,12 +46,12 @@ export const getFormattedSchedulesByRoom = (req: Request, res: Response) => {
   });
 };
 
-// export const bulkScheduleCreate = (req: Request, res: Response) => {
-//   requestHandler(res, async () => {
-//     const { rows, year, semester } = req.body;
-//     res.json(await service.bulkScheduleCreate(year, parseInt(semester), rows as ScheduleInterface[]));
-//   });
-// };
+export const getFormattedSchedulesByRoomYearSem = (req: Request, res: Response) => {
+  requestHandler(res, async () => {
+    const { room_code, year, semester } = req.params;
+    res.json(await service.getFormattedSchedulesByRoomYearSem(room_code, parseInt(year), semester));
+  });
+};
 
 // defaults year 2023 and 2nd semester
 export const bulkFormattedScheduleCreate = (req: Request, res: Response) => {

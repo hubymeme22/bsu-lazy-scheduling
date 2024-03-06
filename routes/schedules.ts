@@ -6,6 +6,8 @@ import {
   getFormattedSchedulesByRoom,
   updateSingleSchedule,
   getFormattedSchedulesByFacultyIdYearSem,
+  getFormattedSchedulesBySectionIdYearSem,
+  getFormattedSchedulesByRoomYearSem
 } from "./controllers/schedules.controller";
 
 const router = Router();
@@ -18,8 +20,16 @@ router.get('/user/formatted/:user_id', (req: Request, res: Response) => {
   getFormattedSchedulesByFacultyId(req, res);
 });
 
+router.get('/section/formatted/:year/:semester/:section_code', (req: Request, res: Response) => {
+  getFormattedSchedulesBySectionIdYearSem(req, res);
+});
+
 router.get('/section/formatted/:section_code', (req: Request, res: Response) => {
   getFormattedSchedulesBySection(req, res);
+});
+
+router.get('/room/formatted/:year/:semester/:room_code', (req: Request, res: Response) => {
+  getFormattedSchedulesByRoomYearSem(req, res);
 });
 
 router.get('/room/formatted/:room_code', (req: Request, res: Response) => {

@@ -326,6 +326,34 @@ export const getSchedulesByFacultyIdYearSem = async (faculty_id: number, year: n
   );
 };
 
+export const getFormattedSchedulesBySectionIdYearSem = async (section_code: string, year: number, semester: string) => {
+  return formatData(
+    (await Schedules.findAndCountAll({
+      where: {
+        section: section_code,
+        semester,
+        year,
+      },
+      raw: true
+    })).rows,
+    true, false, true
+  );
+};
+
+export const getFormattedSchedulesByRoomYearSem = async (room_code: string, year: number, semester: string) => {
+  return formatData(
+    (await Schedules.findAndCountAll({
+      where: {
+        room: room_code,
+        semester,
+        year,
+      },
+      raw: true
+    })).rows,
+    true
+  );
+};
+
 export const getSchedulesBySection = async (section: string) => {
   return await Schedules.findAndCountAll({
     where: { section }
