@@ -109,6 +109,74 @@ export const roomReplacable = async (schedule: ScheduleInterface) => {
   }));
 };
 
+// checks for online conflicts
+export const onlineConflictCheck = async (schedule: ScheduleInterface) => {
+  const targetTime = schedule.time;
+
+  // retrieving the index of the target
+  const targetTimeIndex = TIME_TYPE.findIndex((value) => value === targetTime);
+  const firstTarget = (targetTimeIndex - 3) >= 0 ? (targetTimeIndex - 3) : 0;
+  const lastTarget  = (targetTimeIndex + 3) < TIME_TYPE.length ? (targetTimeIndex + 3) : (TIME_TYPE.length - 1);
+
+  // retrieval of the time included for checking
+  const timeRangeCheck = TIME_TYPE.slice(firstTarget, lastTarget + 1);
+  console.log('Time range: ');
+  console.log(timeRangeCheck);
+
+  // checks conflict for newly added online schedule
+  if (schedule.room === 'OL') {
+    const scheduleMatch = await Schedules.findAndCountAll({
+      where: {
+        day: schedule.day,
+        time: { [Op.or]: timeRangeCheck },
+        section: schedule.section,
+        year: schedule.year,
+        semester: schedule.semester,
+        [Op.and]: [
+          { room: {[Op.not]: 'OL'} },
+          { room: {[Op.not]: ''} }
+        ]
+      },
+      raw: true
+    });
+
+    if (scheduleMatch.count > 0) return {
+      conflicted: true,
+      type: 'online-conflict',
+      schedule
+    };
+
+    return {
+      conflicted: false,
+      type: null,
+      schedule
+    };
+  }
+
+  // checks conflict for newly added ftf schedule
+  const scheduleMatch = await Schedules.findAndCountAll({
+    where: {
+      day: schedule.day,
+      time: { [Op.or]: timeRangeCheck },
+      section: schedule.section,
+      year: schedule.year,
+      semester: schedule.semester,
+      room: 'OL'
+    },
+    raw: true
+  });
+
+  return (scheduleMatch.count > 0) ? {
+    conflicted: true,
+    type: 'online-conflict',
+    schedule
+  } : {
+    conflicted: false,
+    type: null,
+    schedule
+  };
+};
+
 export const conflictCheck = async (schedule: ScheduleInterface) => {
   const { time, day, room, semester } = schedule;
 
@@ -131,7 +199,6 @@ export const conflictCheck = async (schedule: ScheduleInterface) => {
     raw: true
   });
 
-
   // checking if some prof has already assigned the section
   // in the given time and day
   const sectionConflict = await Schedules.findAndCountAll({
@@ -153,17 +220,37 @@ export const conflictCheck = async (schedule: ScheduleInterface) => {
     }
   });
 
+  // conflict checking for ftf & online schedule
+  const ftfOnlineConflictCheck = await onlineConflictCheck(schedule);
+  if (ftfOnlineConflictCheck.conflicted)
+    return ftfOnlineConflictCheck;
+
+  // we don't care if the room is online when adding a new room
   const scheduleOnlineRemoved = scheduleMatch.rows.filter(sched => sched.room !== 'OL');
-  if (scheduleOnlineRemoved.length > 0 || sectionConflict.count > 0) {
+
+  // room conflict counter
+  if (scheduleOnlineRemoved.length > 0) {
     schedule.conflicted = true;
     return {
       conflicted: true,
+      type: 'room-conflict',
+      schedule
+    };
+  }
+
+  // section conflict counter
+  if (sectionConflict.count > 0) {
+    schedule.conflicted = true;
+    return {
+      conflicted: true,
+      type: 'section-conflict',
       schedule
     };
   }
 
   return {
     conflicted: false,
+    type: null,
     schedule
   };
 };
