@@ -115,13 +115,11 @@ export const onlineConflictCheck = async (schedule: ScheduleInterface) => {
 
   // retrieving the index of the target
   const targetTimeIndex = TIME_TYPE.findIndex((value) => value === targetTime);
-  const firstTarget = (targetTimeIndex - 3) >= 0 ? (targetTimeIndex - 3) : 0;
-  const lastTarget  = (targetTimeIndex + 3) < TIME_TYPE.length ? (targetTimeIndex + 3) : (TIME_TYPE.length - 1);
+  const firstTarget = (targetTimeIndex - 6) >= 0 ? (targetTimeIndex - 6) : 0;
+  const lastTarget  = (targetTimeIndex + 6) < TIME_TYPE.length ? (targetTimeIndex + 6) : (TIME_TYPE.length - 1);
 
   // retrieval of the time included for checking
   const timeRangeCheck = TIME_TYPE.slice(firstTarget, lastTarget + 1);
-  console.log('Time range: ');
-  console.log(timeRangeCheck);
 
   // checks conflict for newly added online schedule
   if (schedule.room === 'OL') {
