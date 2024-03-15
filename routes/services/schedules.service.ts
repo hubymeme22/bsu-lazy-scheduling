@@ -138,13 +138,11 @@ export const onlineConflictCheck = async (schedule: ScheduleInterface) => {
       raw: true
     });
 
-    if (scheduleMatch.count > 0) return {
+    return (scheduleMatch.count > 0) ? {
       conflicted: true,
       type: 'online-conflict',
       schedule
-    };
-
-    return {
+    } : {
       conflicted: false,
       type: null,
       schedule
@@ -166,7 +164,7 @@ export const onlineConflictCheck = async (schedule: ScheduleInterface) => {
 
   return (scheduleMatch.count > 0) ? {
     conflicted: true,
-    type: 'online-conflict',
+    type: 'ftf-conflict',
     schedule
   } : {
     conflicted: false,
@@ -257,8 +255,13 @@ export const bulkScheduleCreate = async (schedule: ScheduleInterface[]) => {
   if (schedule.length === 0)
     return await Schedules.findAndCountAll();
 
-  // for delete functionality
   for (let i = 0; i < schedule.length; i++) {
+    // replace the online schedules with removed spaces/newline format
+    schedule[i].section = schedule[i].section.replace(' ', '').replace('\n', '');
+    schedule[i].room = schedule[i].room.replace(' ', '').replace('\n', '');
+    schedule[i].subject = schedule[i].subject.replace(' ', '').replace('\n', '');
+
+    // for delete functionality
     const sched = schedule[i];
     if (sched.section === '' || sched.room === '' || sched.subject === '') {
       await Schedules.destroy({
