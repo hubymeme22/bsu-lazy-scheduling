@@ -138,6 +138,7 @@ export const onlineConflictCheck = async (schedule: ScheduleInterface) => {
       raw: true
     });
 
+    (scheduleMatch.count > 0) ? schedule.conflicted = true : {};
     return (scheduleMatch.count > 0) ? {
       conflicted: true,
       type: 'online-conflict',
@@ -162,6 +163,7 @@ export const onlineConflictCheck = async (schedule: ScheduleInterface) => {
     raw: true
   });
 
+  (scheduleMatch.count > 0) ? schedule.conflicted = true : {};
   return (scheduleMatch.count > 0) ? {
     conflicted: true,
     type: 'ftf-conflict',
