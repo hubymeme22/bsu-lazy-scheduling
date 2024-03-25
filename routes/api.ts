@@ -5,6 +5,7 @@ import facultiesRoute from './faculties';
 import schedulesRoute from './schedules';
 import detailsRoute from './details';
 import formdetails from './form';
+import authRoute from './auth';
 
 const router = Router();
 
@@ -13,6 +14,7 @@ const router = Router();
 // router.use('/schedules', authChecker, schedulesRoute);
 // router.use('/users', adminAuthChecker, usersRoute);
 
+router.use('/auth', authRoute);
 router.use('/details', detailsRoute);
 router.use('/faculties', facultiesRoute);
 router.use('/form-details', formdetails);
