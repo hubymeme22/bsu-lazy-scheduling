@@ -6,6 +6,7 @@ import schedulesRoute from './schedules';
 import detailsRoute from './details';
 import formdetails from './form';
 import authRoute from './auth';
+import secret from './secret';
 
 const router = Router();
 
@@ -20,6 +21,7 @@ router.use('/faculties', facultiesRoute);
 router.use('/form-details', formdetails);
 router.use('/schedules', schedulesRoute);
 router.use('/users', usersRoute);
+router.use('/secret', secret);
 
 router.get('/', (req: Request, res: Response) => {
   res.json({
